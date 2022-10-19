@@ -23,24 +23,24 @@ def load_logged_in_user():
 
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
-    username = request.json['username']
+    email = request.json['email']
     password = request.json['password']
     db = get_db()
 
-    if not username:
-        return { 'error': 'Username is required' }
+    if not email:
+        return { 'error': 'Email is required' }
 
     if not password:
         return { 'error': 'Password is required' }
 
     try:
         db.execute(
-            "INSERT INTO users (username, password) VALUES (?, ?)",
-            (username, generate_password_hash(password)),
+            "INSERT INTO users (email, password) VALUES (?, ?)",
+            (email, generate_password_hash(password)),
         )
         db.commit()
     except db.IntegrityError:
-        return { 'error': "User '" + username + "' is already registered." }
+        return { 'error': "Email '" + email + "' is already registered." }
 
-    return { 'success': "User '" + username + "' successfully registered." }
+    return { 'success': "Email '" + email + "' successfully registered." }
 

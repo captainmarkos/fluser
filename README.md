@@ -2,6 +2,7 @@
 
 ```
 $ . venv/bin/activate
+$ flask --app api init-db
 $ flask --app api --debug run
 
 $ curl http://127.0.0.1:5000/status
@@ -15,7 +16,7 @@ users
 sqlite> .schema users
 CREATE TABLE users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  username TEXT UNIQUE NOT NULL,
+  email TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -28,7 +29,7 @@ sqlite> pragma table_info('users');
 | cid |    name    |   type    | notnull |    dflt_value     | pk |
 +-----+------------+-----------+---------+-------------------+----+
 | 0   | id         | INTEGER   | 0       |                   | 1  |
-| 1   | username   | TEXT      | 1       |                   | 0  |
+| 1   | email      | TEXT      | 1       |                   | 0  |
 | 2   | password   | TEXT      | 1       |                   | 0  |
 | 3   | created_at | TIMESTAMP | 1       | CURRENT_TIMESTAMP | 0  |
 +-----+------------+-----------+---------+-------------------+----+
@@ -47,7 +48,7 @@ The return value from a view function is automatically converted into a response
 ```bash
 $ curl -v 'http://127.0.0.1:5000/auth/register' \
        -H 'Content-Type: application/json' \
-       --data-raw '{"username": "bobby@foo.com", "password": "bar" }'
+       --data-raw '{"email": "bobby@foo.com", "password": "bar" }'
 
 *   Trying 127.0.0.1:5000...
 * Connected to 127.0.0.1 (127.0.0.1) port 5000 (#0)
@@ -67,6 +68,6 @@ $ curl -v 'http://127.0.0.1:5000/auth/register' \
 < Connection: close
 <
 {
-  "success": "User 'bobby@foo.com' successfully registered."
+  "success": "Email 'bobby@foo.com' successfully registered."
 }
 ```
