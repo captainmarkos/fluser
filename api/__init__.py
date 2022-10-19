@@ -23,11 +23,11 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # a simple page that says hello
+    # a route to check server status
     @app.route('/status')
-    def hello():
+    def status():
         now = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-        return '{timestamp: "' + now + '"}'
+        return { 'timestamp': now }
 
     from . import db
     db.init_app(app)
