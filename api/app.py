@@ -21,10 +21,10 @@ def status():
     now = strftime("%Y-%m-%d %H:%M:%S", gmtime())
     return { 'timestamp': now }
 
-from . import db
+import db
 db.init_app(app)
 
-from . import auth
+import auth
 app.register_blueprint(auth.bp)
 
 #from . import blog

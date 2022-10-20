@@ -1,4 +1,4 @@
-FROM python:3.8-slim-buster
+FROM python:3.10.6
 
 COPY ./requirements.txt /app/requirements.txt
 
@@ -8,7 +8,5 @@ RUN pip3 install -r requirements.txt
 
 COPY . /app
 
-#CMD [ "python3", "-m" , "flask", "--app", "api", "--debug", "run", "--host=0.0.0.0"]
-
 ENTRYPOINT [ "python3" ]
-CMD ["api/app.py"]
+CMD [ "api/app.py" ]

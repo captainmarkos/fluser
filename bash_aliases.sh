@@ -72,9 +72,7 @@ function rnr_fluser() {
     echo "==> docker build -t fluser .";
     docker build -t fluser .;
 
-    printf %"s\n" "==> docker run --detach -p 5000:5000" \
-                  "               --name fluser fluser" \
-                  "               -v $SRC_DIR:/app fluser";
+    printf %"s\n" "==> docker run --detach -p 5000:5000 --name fluser fluser -v $SRC_DIR:/app fluser";
 
     docker run --detach -p 5000:5000 \
                --name fluser fluser
