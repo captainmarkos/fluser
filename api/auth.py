@@ -10,6 +10,16 @@ from db import get_db
 # blueprint for authentication functions
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
+def find_user(email, include_password=False):
+    user = get_db().execute(
+        'SELECT * FROM users WHERE email = ?', (email,)
+    ).fetchone()
+
+    if not include_password:
+      del(user['password']) # delete key from dictionary
+
+    return user
+
 @bp.before_app_request
 def load_logged_in_user():
     user_id = session.get('user_id')
@@ -21,20 +31,17 @@ def load_logged_in_user():
             'SELECT * FROM users WHERE id = ?', (user_id,)
         ).fetchone()
 
-@bp.route('/register', methods=('GET', 'POST'))
+@bp.route('/register', methods=['POST'])
 def register():
-    if request.method != 'POST':
-        return { 'error': 'POST method required' }
-
     email = request.json['email']
     password = request.json['password']
     db = get_db()
 
     if not email:
-        return { 'error': 'Email is required' }
+        return { 'status': 'error', 'message': 'Email is required' }
 
     if not password:
-        return { 'error': 'Password is required' }
+        return { 'status': 'error', 'message': 'Password is required' }
 
     try:
         db.execute(
@@ -43,49 +50,52 @@ def register():
         )
         db.commit()
     except db.IntegrityError:
-        return { 'error': "Email '" + email + "' is already registered." }
+        return {
+            'status': 'error',
+            'message': "Email '" + email + "' is already registered."
+        }
 
-    return { 'success': "Email '" + email + "' successfully registered." }
+    return {
+        'status': 'success',
+        'message': "Email '" + email + "' successfully registered.",
+        'user': find_user(email)
+    }
 
-@bp.route('/login', methods=('GET', 'POST'))
+@bp.route('/login', methods=['POST'])
 def login():
-    if request.method != 'POST':
-        return { 'error': 'POST method required' }
-
     email = request.json['email']
     password = request.json['password']
     db = get_db()
 
-    user = db.execute(
-        'SELECT * FROM users WHERE email = ?', (email,)
-    ).fetchone()
+    user = find_user(email, True) # include password in dictionary
 
     if user is None:
-        return { 'error': 'Incorrect email ' + email }
+        return { 'status': 'error', 'message': 'Incorrect email ' + email }
     elif not check_password_hash(user['password'], password):
-        return { 'error': 'Incorrect password' }
+        return { 'status': 'error', 'message': 'Incorrect password' }
 
-    return { 'success': 'User authenticated' }
+    del(user['password']) # no password in response
+    return {
+        'status': 'success',
+        'message': 'User authenticated',
+        'user': user
+    }
 
-@bp.route('/users', methods=('GET', 'POST'))
+@bp.route('/users', methods=['GET'])
 def users():
-    if request.method == 'POST':
-        return { 'error': 'GET method required' }
-
     db = get_db()
 
     users = db.execute('SELECT * FROM users').fetchall()
 
     if users is None:
-        return { 'count': 0, 'error': 'No users registered' }
+        return { 'count': 0, 'status': 'error', 'message': 'No users registered' }
 
-    #for user in users:
     user_list = []
     for user in users:
-      user_list.append({
-        'email': user['email'],
-        'created_at': user['created_at']
-      })
+        user_list.append({
+            'id': user['id'],
+            'email': user['email'],
+            'created_at': user['created_at']
+        })
 
     return { 'users': user_list, 'count': len(users), 'success': 'Users fetched' }
-

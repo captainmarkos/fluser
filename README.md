@@ -87,3 +87,39 @@ Jinja2==3.1.2
 MarkupSafe==2.1.1
 Werkzeug==2.2.2
 ```
+
+
+#### DB Queries in Python CLI
+
+[DB-API 2.0 interface for SQLite Databases](https://docs.python.org/3/library/sqlite3.html)
+```python
+>>> import sqlite3
+>>> db = sqlite3.connect('instance/fluser.sqlite', detect_types=sqlite3.PARSE_DECLTYPES)
+>>> db.row_factory = sqlite3.Row
+>>> res = db.execute('SELECT * FROM users').fetchone()
+
+>>> tuple(res)
+(1, 'thor@yahoo.com', 'password', datetime.datetime(2022, 10, 19, 5, 48, 58))
+
+>>> res['email']
+'thor@yahoo.com'
+>>> res['created_at']
+datetime.datetime(2022, 10, 19, 5, 48, 58)
+```
+
+Setup the `Connection` object to use a custom `row_factory`. See [here](https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.row_factory).
+```python
+>>> import sqlite3
+>>> db = sqlite3.connect('instance/fluser.sqlite', detect_types=sqlite3.PARSE_DECLTYPES)
+
+>>> def dict_factory(cursor, row):
+...     col_names = [col[0] for col in cursor.description]
+...     return {key: value for key, value in zip(col_names, row)}
+...
+>>> db.row_factory = dict_factory
+>>> res = db.execute('SELECT * FROM users').fetchone()
+>>> print(res)
+{'id': 1, 'email': 'thor@yahoo.com', 'password': 'password', 'created_at': datetime.datetime(2022, 10, 19, 5, 48, 58)}
+>>> res['email']
+'thor@yahoo.com'
+```
