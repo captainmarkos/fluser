@@ -1,14 +1,36 @@
 ### Flask User Service
 
+Run as a Docker container:
+```bash
+$ docker build -t fluser .
+$ docker run --detach -p 5000:5000 --name fluser fluser
+
+# or
+$ source bash_aliases.sh
+$ rnr_fluser
 ```
+
+If were run with `flask run`:
+```bash
 $ . venv/bin/activate
 $ flask --app api init-db
 $ flask --app api --debug run
+```
 
+Check the app is running
+```bash
 $ curl http://127.0.0.1:5000/status
 ```
 
+#### The Database
+
+To initialize the DB, run `init-db`
+```bash
+$ flask --app api init-db
 ```
+
+Verify the DB has been initialized
+```bash
 $ sqlite3 instance/fluser.sqlite
 sqlite> .tables
 users
