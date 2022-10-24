@@ -90,7 +90,13 @@ $ curl -v 'http://127.0.0.1:5000/auth/register' \
 < Connection: close
 <
 {
-  "success": "Email 'bobby@foo.com' successfully registered."
+  "message": "Email 'bobby@foo.com' successfully registered.",
+  "status": "success",
+  "user": {
+    "created_at": "Sun, 23 Oct 2022 22:35:59 GMT",
+    "email": "bobby@foo.com",
+    "id": 4
+  }
 }
 ```
 
